@@ -1,0 +1,19 @@
+<resources>
+    <string name="app_name">Music++</string>
+
+    <string name="navigation_drawer_open">打开菜单</string>
+    <string name="navigation_drawer_close">关闭菜单</string>
+
+    <string name="action_settings">菜单</string>
+
+    <!-- Menu Setting -->
+    <string name="menu_music">我的音乐</string>
+    <string name="menu_favourite">我的收藏</string>
+    <string name="menu_recent">最近播放</string>
+
+    <string name="menu_settings">设置</string>
+    <string name="menu_share">分享</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+</resources>
