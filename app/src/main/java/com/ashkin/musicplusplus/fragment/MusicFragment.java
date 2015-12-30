@@ -3,7 +3,10 @@ package com.ashkin.musicplusplus.fragment;
 import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.v4.view.PagerAdapter;
+import android.support.design.widget.TabLayout;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,9 +19,17 @@ import com.ashkin.musicplusplus.R;
  */
 public class MusicFragment extends BaseFragment {
     private static final String[] title = {"音乐", "歌手", "专辑"};
+    public static final int MUSIC = 0;
+    public static final int ARTIST = 1;
+    public static final int ALBUM = 2;
+
     public static final int NUM_ITEMS = 3;
 
     private OnFragmentInteractionListener mListener;
+
+    private MusicListFragment musicListFragment;
+    private ArtistListFragment artistListFragment;
+    private AlbumListFragment albumListFragment;
 
     public MusicFragment() {
         // Required empty public constructor
@@ -45,28 +56,10 @@ public class MusicFragment extends BaseFragment {
     }
 
     private void initView(View view) {
+        TabLayout mTabLayout = (TabLayout) view.findViewById(R.id.music_tablayout_id);
         ViewPager mViewPager = (ViewPager) view.findViewById(R.id.music_viewpager_id);
-        mViewPager.setAdapter(new PagerAdapter() {
-            @Override
-            public Object instantiateItem(ViewGroup container, int position) {
-                return super.instantiateItem(container, position);
-            }
-
-            @Override
-            public void destroyItem(ViewGroup container, int position, Object object) {
-                super.destroyItem(container, position, object);
-            }
-
-            @Override
-            public int getCount() {
-                return NUM_ITEMS;
-            }
-
-            @Override
-            public boolean isViewFromObject(View view, Object object) {
-                return false;
-            }
-        });
+        mViewPager.setAdapter(new MusicPagerAdapter(getActivity().getSupportFragmentManager()));
+        mTabLayout.setupWithViewPager(mViewPager);
     }
 
     // TODO: Rename method, update argument and hook method into UI event
@@ -91,5 +84,51 @@ public class MusicFragment extends BaseFragment {
     public void onDetach() {
         super.onDetach();
         mListener = null;
+    }
+
+    class MusicPagerAdapter extends FragmentPagerAdapter {
+        public MusicPagerAdapter(FragmentManager fm) {
+            super(fm);
+        }
+
+        @Override
+        public CharSequence getPageTitle(int position) {
+            switch (position) {
+                case MUSIC:
+                    return title[MUSIC];
+                case ARTIST:
+                    return title[ARTIST];
+                case ALBUM:
+                    return title[ALBUM];
+            }
+            return super.getPageTitle(position);
+        }
+
+        @Override
+        public Fragment getItem(int position) {
+            switch (position) {
+                case MUSIC:
+                    if (null == musicListFragment) {
+                        musicListFragment = new MusicListFragment();
+                    }
+                    return musicListFragment;
+                case ARTIST:
+                    if (null == artistListFragment) {
+                        artistListFragment = new ArtistListFragment();
+                    }
+                    return artistListFragment;
+                case ALBUM:
+                    if (null == albumListFragment) {
+                        albumListFragment = new AlbumListFragment();
+                    }
+                    return albumListFragment;
+            }
+            return null;
+        }
+
+        @Override
+        public int getCount() {
+            return NUM_ITEMS;
+        }
     }
 }
