@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:clickable="true"
+    android:orientation="horizontal"
+    android:paddingBottom="@dimen/item_music_sub_padding"
+    android:paddingEnd="@dimen/item_music_padding"
+    android:paddingLeft="@dimen/item_music_padding"
+    android:paddingRight="@dimen/item_music_padding"
+    android:paddingStart="@dimen/item_music_padding"
+    android:paddingTop="@dimen/item_music_sub_padding">
+
+    <TextView
+        android:id="@+id/music_no_id"
+        android:layout_width="@dimen/item_music_length"
+        android:layout_height="@dimen/item_music_length"
+        android:gravity="center"
+        android:textSize="@dimen/item_music_text"
+        tools:text="1" />
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="@dimen/item_music_length"
+        android:layout_weight="1"
+        android:gravity="center_vertical"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/music_title_id"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:ellipsize="end"
+            android:singleLine="true"
+            android:textSize="@dimen/item_music_text"
+            tools:text="歌曲名" />
+
+        <TextView
+            android:id="@+id/music_artist_id"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/item_music_sub_padding"
+            android:ellipsize="end"
+            android:singleLine="true"
+            android:textSize="@dimen/item_music_subtext"
+            tools:text="歌手名" />
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/music_duration_id"
+        android:layout_width="@dimen/item_music_length"
+        android:layout_height="@dimen/item_music_length"
+        android:gravity="center"
+        android:textSize="@dimen/item_music_text"
+        tools:text="06:14" />
+</LinearLayout>

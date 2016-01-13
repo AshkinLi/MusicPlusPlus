@@ -1,27 +1,31 @@
 package com.ashkin.musicplusplus.fragment;
 
 import android.content.Context;
+import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
-import android.util.Log;
+import android.provider.MediaStore;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.CursorLoader;
+import android.support.v4.content.Loader;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import com.ashkin.musicplusplus.R;
+import com.ashkin.musicplusplus.adapter.CursorMusicAdapter;
 
 /**
- * A simple {@link Fragment} subclass.
- * Activities that contain this fragment must implement the
- * {@link MusicListFragment.OnFragmentInteractionListener} interface
- * to handle interaction events.
+ * 音乐列表
  */
-public class MusicListFragment extends BaseFragment {
+public class MusicListFragment extends BaseFragment implements LoaderManager.LoaderCallbacks<Cursor> {
 
     private OnFragmentInteractionListener mListener;
 
-    View view;
+    private Context mContext = null;
+    private RecyclerView mRecyclerView;
 
     public MusicListFragment() {
         // Required empty public constructor
@@ -30,11 +34,16 @@ public class MusicListFragment extends BaseFragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        view = inflater.inflate(R.layout.fragment_music_list, container, false);
+        mContext = getContext();
+
+        View view = inflater.inflate(R.layout.fragment_music_list, container, false);
+        mRecyclerView = (RecyclerView) view.findViewById(R.id.music_list_id);
+        mRecyclerView.setLayoutManager(new LinearLayoutManager(mContext));
+//        mRecyclerView.setAdapter();
+        getLoaderManager().initLoader(0, null, this);
         return view;
     }
 
-    // TODO: Rename method, update argument and hook method into UI event
     public void onButtonPressed(Uri uri) {
         if (mListener != null) {
             mListener.onFragmentInteraction(uri);
@@ -56,5 +65,34 @@ public class MusicListFragment extends BaseFragment {
     public void onDetach() {
         super.onDetach();
         mListener = null;
+    }
+
+    @Override
+    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+        String[] projection = {
+                MediaStore.Audio.Media._ID,
+                MediaStore.Audio.Media.DATA,
+                MediaStore.Audio.Media.ALBUM,
+                MediaStore.Audio.Media.TITLE,
+                MediaStore.Audio.Media.ARTIST,
+                MediaStore.Audio.Media.DURATION
+        };
+
+        return new CursorLoader(mContext,
+                MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
+                projection,
+                null,
+                null,
+                MediaStore.Audio.Media.TITLE);
+    }
+
+    @Override
+    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+        mRecyclerView.setAdapter(new CursorMusicAdapter(mContext, data));
+    }
+
+    @Override
+    public void onLoaderReset(Loader<Cursor> loader) {
+
     }
 }
