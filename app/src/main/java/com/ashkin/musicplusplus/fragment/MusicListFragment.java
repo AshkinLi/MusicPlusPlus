@@ -42,14 +42,13 @@ public class MusicListFragment extends BaseFragment implements LoaderManager.Loa
         View view = inflater.inflate(R.layout.fragment_music_list, container, false);
         mRecyclerView = (RecyclerView) view.findViewById(R.id.music_list_id);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(mContext));
-//        mRecyclerView.setAdapter();
         getLoaderManager().initLoader(0, null, this);
         return view;
     }
 
-    public void onButtonPressed(Uri uri) {
+    public void onButtonPressed(String msg) {
         if (mListener != null) {
-            mListener.onFragmentInteraction(uri);
+            mListener.onFragmentInteraction(msg);
         }
     }
 

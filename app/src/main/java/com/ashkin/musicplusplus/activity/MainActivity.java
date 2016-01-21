@@ -4,6 +4,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.NavigationView.OnNavigationItemSelectedListener;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.GravityCompat;
@@ -21,6 +22,7 @@ import com.ashkin.musicplusplus.fragment.MusicFragment;
 import com.ashkin.musicplusplus.fragment.RecentFragment;
 import com.ashkin.musicplusplus.fragment.SettingsFragment;
 import com.ashkin.musicplusplus.fragment.ShareFragment;
+import com.ashkin.musicplusplus.utils.LogUtil;
 
 import java.util.List;
 
@@ -210,7 +212,7 @@ public class MainActivity extends AppCompatActivity
     }
 
     @Override
-    public void onFragmentInteraction(Uri uri) {
-
+    public void onFragmentInteraction(String msg) {
+        Snackbar.make(findViewById(R.id.playbar_id), msg, Snackbar.LENGTH_LONG).show();
     }
 }
