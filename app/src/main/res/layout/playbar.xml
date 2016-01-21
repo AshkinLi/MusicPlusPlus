@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/playbar_id"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_alignParentBottom="true"
+    android:alpha="0.8"
+    android:background="@color/colorPrimary"
+    android:orientation="horizontal"
+    android:padding="@dimen/playbar_padding">
+
+    <ImageButton
+        android:id="@+id/playbar_prev_id"
+        android:layout_width="@dimen/playbar_image_size"
+        android:layout_height="@dimen/playbar_image_size"
+        android:background="@null"
+        android:contentDescription="@string/playbar_prev"
+        android:src="@drawable/ic_music_prev" />
+
+    <ImageButton
+        android:id="@+id/playbar_icon_id"
+        android:layout_width="@dimen/playbar_image_size"
+        android:layout_height="@dimen/playbar_image_size"
+        android:background="@null"
+        android:contentDescription="@string/playbar_icon"
+        android:src="@drawable/ic_album" />
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:gravity="center"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/playbar_title_id"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ellipsize="marquee"
+            android:gravity="center"
+            android:singleLine="true"
+            android:textSize="@dimen/playbar_title_size"
+            tools:text="歌曲名" />
+
+        <TextView
+            android:id="@+id/playbar_artist_id"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/playbar_margin"
+            android:ellipsize="marquee"
+            android:gravity="center"
+            android:singleLine="true"
+            android:textSize="@dimen/playbar_artist_size"
+            tools:text="歌手名" />
+    </LinearLayout>
+
+    <ImageButton
+        android:id="@+id/playbar_play_id"
+        android:layout_width="@dimen/playbar_image_size"
+        android:layout_height="@dimen/playbar_image_size"
+        android:background="@null"
+        android:contentDescription="@string/playbar_play"
+        android:src="@drawable/ic_music_play" />
+
+    <ImageButton
+        android:id="@+id/playbar_next_id"
+        android:layout_width="@dimen/playbar_image_size"
+        android:layout_height="@dimen/playbar_image_size"
+        android:background="@null"
+        android:contentDescription="@string/playbar_next"
+        android:src="@drawable/ic_music_next" />
+</LinearLayout>
+

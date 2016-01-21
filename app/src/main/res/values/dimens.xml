@@ -8,6 +8,13 @@
     <dimen name="fab_margin">16dp</dimen>
     <dimen name="text_margin">16dp</dimen>
 
+    <!-- Music Activity -->
+    <dimen name="playbar_padding">8dp</dimen>
+    <dimen name="playbar_margin">8dp</dimen>
+    <dimen name="playbar_image_size">64dp</dimen>
+    <dimen name="playbar_title_size">20sp</dimen>
+    <dimen name="playbar_artist_size">14sp</dimen>
+
     <!-- Music Item -->
     <dimen name="item_music_padding">16dp</dimen>
     <dimen name="item_music_sub_padding">8dp</dimen>

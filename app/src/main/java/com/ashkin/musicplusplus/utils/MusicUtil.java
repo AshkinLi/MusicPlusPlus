@@ -96,6 +96,18 @@ public class MusicUtil implements MediaPlayer.OnPreparedListener {
         mPlayer = null;
     }
 
+    /**
+     * 音乐是否在播放
+     *
+     * @return 如果正在播放，返回 true
+     */
+    public boolean isPlaying() {
+        if (null != mPlayer && mPlayer.isPlaying()) {
+            return true;
+        }
+        return false;
+    }
+
     @Override
     public void onPrepared(MediaPlayer mp) {
         mp.seekTo(msec);

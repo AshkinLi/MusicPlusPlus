@@ -133,6 +133,10 @@ public class MainActivity extends AppCompatActivity
         });
     }
 
+    public int getPlaybarHeight() {
+        return findViewById(R.id.playbar_id).getHeight();
+    }
+
     @Override
     public void onBackPressed() {
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);

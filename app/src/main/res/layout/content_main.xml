@@ -9,4 +9,6 @@
     tools:context=".activity.MainActivity"
     tools:showIn="@layout/app_bar_main">
 
+    <include layout="@layout/playbar" />
+
 </RelativeLayout>

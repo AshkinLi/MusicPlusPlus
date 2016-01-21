@@ -15,6 +15,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.ashkin.musicplusplus.R;
+import com.ashkin.musicplusplus.activity.MainActivity;
 import com.ashkin.musicplusplus.adapter.CursorMusicAdapter;
 
 /**
@@ -24,7 +25,7 @@ public class MusicListFragment extends BaseFragment implements LoaderManager.Loa
 
     private OnFragmentInteractionListener mListener;
 
-    private Context mContext = null;
+    private MainActivity mContext = null;
     private RecyclerView mRecyclerView;
 
     public MusicListFragment() {
@@ -34,7 +35,9 @@ public class MusicListFragment extends BaseFragment implements LoaderManager.Loa
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        mContext = getContext();
+        if (getContext() instanceof MainActivity) {
+            mContext = (MainActivity) getContext();
+        }
 
         View view = inflater.inflate(R.layout.fragment_music_list, container, false);
         mRecyclerView = (RecyclerView) view.findViewById(R.id.music_list_id);
