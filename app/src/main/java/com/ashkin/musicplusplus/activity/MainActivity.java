@@ -23,6 +23,7 @@ import com.ashkin.musicplusplus.fragment.RecentFragment;
 import com.ashkin.musicplusplus.fragment.SettingsFragment;
 import com.ashkin.musicplusplus.fragment.ShareFragment;
 import com.ashkin.musicplusplus.utils.LogUtil;
+import com.ashkin.musicplusplus.utils.MusicUtil;
 
 import java.util.List;
 
@@ -43,6 +44,8 @@ public class MainActivity extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        MusicUtil.initialization(this);
 
         initToolbar();
 
@@ -213,6 +216,7 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public void onFragmentInteraction(String msg) {
-        Snackbar.make(findViewById(R.id.playbar_id), msg, Snackbar.LENGTH_LONG).show();
+//        Snackbar.make(findViewById(R.id.playbar_id), msg, Snackbar.LENGTH_LONG).show();
+        MusicUtil.getInstance().start(msg);
     }
 }

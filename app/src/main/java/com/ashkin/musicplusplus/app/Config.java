@@ -14,7 +14,7 @@ public class Config {
 
     // Music
     public static final String ACTION_COMPLETE = "com.ashkin.musicplusplus.action.complete";
-    public static final String MUSIC_DATA = "data";
+    public static final String MUSIC_DATA = "_data";
     public static final String MUSIC_TITLE = "title";
     public static final String MUSIC_ARTIST = "artist";
     public static final String MUSIC_ALBUM = "album";

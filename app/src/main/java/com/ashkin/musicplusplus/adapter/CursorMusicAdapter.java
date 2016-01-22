@@ -27,6 +27,7 @@ public class CursorMusicAdapter extends RecyclerView.Adapter<CursorMusicAdapter.
     private MainActivity mContext;
     private final LayoutInflater mLayoutInflater;
     private Cursor mCursor;
+    private MusicItemOnClickListener mListener;
 
     public CursorMusicAdapter(Context context, Cursor cursor) {
         mLayoutInflater = LayoutInflater.from(context);
@@ -34,6 +35,7 @@ public class CursorMusicAdapter extends RecyclerView.Adapter<CursorMusicAdapter.
             mContext = (MainActivity) context;
         }
         this.mCursor = cursor;
+        mListener = new MusicItemOnClickListener(mContext, mCursor);
     }
 
     @Override
@@ -69,12 +71,8 @@ public class CursorMusicAdapter extends RecyclerView.Adapter<CursorMusicAdapter.
             holder.mArtistTextView.setText(mCursor.getString(mCursor.getColumnIndex(Config.MUSIC_ARTIST)));
             holder.mDurationTextView.setText(StringUtil.durationToData(mCursor.getInt(mCursor.getColumnIndex(Config.MUSIC_DURATION))));
 
-            holder.mItemView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    mContext.onFragmentInteraction("我被点击了, position = " + position);
-                }
-            });
+            holder.mItemView.setId(position);
+            holder.mItemView.setOnClickListener(mListener);
         }
     }
 
@@ -83,6 +81,29 @@ public class CursorMusicAdapter extends RecyclerView.Adapter<CursorMusicAdapter.
         return mCursor.getCount() + 1;
     }
 
+    /**
+     * 列表项点击监听器
+     */
+    public static class MusicItemOnClickListener implements View.OnClickListener {
+
+        private MainActivity mContext;
+        private Cursor mCursor;
+
+        public MusicItemOnClickListener(Context context, Cursor cursor) {
+            mContext = (MainActivity) context;
+            mCursor = cursor;
+        }
+
+        @Override
+        public void onClick(View v) {
+            mCursor.moveToPosition(v.getId());
+            mContext.onFragmentInteraction(mCursor.getString(mCursor.getColumnIndex(Config.MUSIC_DATA)));
+        }
+    }
+
+    /**
+     * 列表项 ViewHolder
+     */
     public static class MusicItemViewHolder extends RecyclerView.ViewHolder {
 
         View mItemView;

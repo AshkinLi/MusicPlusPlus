@@ -2,6 +2,7 @@ package com.ashkin.musicplusplus.utils;
 
 import android.content.Context;
 import android.content.Intent;
+import android.media.AudioManager;
 import android.media.MediaPlayer;
 
 import com.ashkin.musicplusplus.app.Config;
@@ -18,11 +19,13 @@ public class MusicUtil implements MediaPlayer.OnPreparedListener {
 
     private Context mContext;
     private MediaPlayer mPlayer;
-    private int msec;
+    private int mSec;
 
     private MusicUtil(final Context context) {
         this.mContext = context;
         this.mPlayer = new MediaPlayer();
+        mPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
+        mPlayer.setOnPreparedListener(this);
         mPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
             @Override
             public void onCompletion(MediaPlayer mp) {
@@ -59,16 +62,15 @@ public class MusicUtil implements MediaPlayer.OnPreparedListener {
     }
 
     /**
-     * 从 msec 处开始播放音乐
+     * 从 mSec 处开始播放音乐
      *
      * @param data 音乐的 data 数据
      * @param msec 音乐的毫秒数
      */
     public void start(String data, int msec) {
-        // TODO: 播放音乐
         try {
-            this.msec = msec;
-            LogUtil.i(TAG, "i : 播放音乐, data = " + data + " msec = " + msec);
+            this.mSec = msec;
+            LogUtil.i(TAG, "i : 播放音乐, data = " + data + " mSec = " + msec);
             mPlayer.reset();
             mPlayer.setDataSource(data);
             mPlayer.prepareAsync();
@@ -110,7 +112,8 @@ public class MusicUtil implements MediaPlayer.OnPreparedListener {
 
     @Override
     public void onPrepared(MediaPlayer mp) {
-        mp.seekTo(msec);
+        LogUtil.i(TAG, "缓冲成功，开始播放");
+        mp.seekTo(mSec);
         mp.start();
     }
 }
