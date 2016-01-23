@@ -14,6 +14,8 @@ import android.widget.TextView;
 import com.ashkin.musicplusplus.R;
 import com.ashkin.musicplusplus.activity.MainActivity;
 import com.ashkin.musicplusplus.app.Config;
+import com.ashkin.musicplusplus.bean.MusicItem;
+import com.ashkin.musicplusplus.utils.MusicItemUtil;
 import com.ashkin.musicplusplus.utils.StringUtil;
 
 /**
@@ -97,7 +99,10 @@ public class CursorMusicAdapter extends RecyclerView.Adapter<CursorMusicAdapter.
         @Override
         public void onClick(View v) {
             mCursor.moveToPosition(v.getId());
-            mContext.onFragmentInteraction(mCursor.getString(mCursor.getColumnIndex(Config.MUSIC_DATA)));
+
+            mContext.setCursor(mCursor);
+            mContext.setPosition(v.getId());
+            mContext.onFragmentInteraction(MusicItemUtil.getMusicItem(mCursor));
         }
     }
 

@@ -7,6 +7,8 @@
     android:layout_alignParentBottom="true"
     android:alpha="0.8"
     android:background="@color/colorPrimary"
+    android:clickable="true"
+    android:focusable="true"
     android:orientation="horizontal"
     android:padding="@dimen/playbar_padding">
 
@@ -15,6 +17,7 @@
         android:layout_width="@dimen/playbar_image_size"
         android:layout_height="@dimen/playbar_image_size"
         android:background="@null"
+        android:clickable="true"
         android:contentDescription="@string/playbar_prev"
         android:src="@drawable/ic_music_prev" />
 
@@ -23,6 +26,7 @@
         android:layout_width="@dimen/playbar_image_size"
         android:layout_height="@dimen/playbar_image_size"
         android:background="@null"
+        android:clickable="true"
         android:contentDescription="@string/playbar_icon"
         android:src="@drawable/ic_album" />
 
@@ -60,6 +64,7 @@
         android:layout_width="@dimen/playbar_image_size"
         android:layout_height="@dimen/playbar_image_size"
         android:background="@null"
+        android:clickable="true"
         android:contentDescription="@string/playbar_play"
         android:src="@drawable/ic_music_play" />
 
@@ -68,6 +73,7 @@
         android:layout_width="@dimen/playbar_image_size"
         android:layout_height="@dimen/playbar_image_size"
         android:background="@null"
+        android:clickable="true"
         android:contentDescription="@string/playbar_next"
         android:src="@drawable/ic_music_next" />
 </LinearLayout>
