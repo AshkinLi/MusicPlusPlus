@@ -336,58 +336,15 @@ public class MainActivity extends BaseActivity {
         startService(intent);
     }
 
-    @Override
-    public void onClick(View v) {
-        switch (v.getId()) {
-            case R.id.playbar_prev_id:
-                LogUtil.i(TAG, "onClick: 上一曲");
-
-                isPlaying = true;
-
-                int prev = getPosition();
-
-                if (prev == 0) {
-                    setPosition(getCursor().getCount() - 1);
-
-                    getCursor().moveToPosition(getPosition());
-
-                    updatePlaybar();
-                } else {
-                    setPosition(getPosition() - 1);
-
-                    getCursor().moveToPosition(getPosition());
-
-                    updatePlaybar();
-                }
-
-                sendMusicServiceAction(Config.MUSIC_ACTION_START, 0);
-
-                break;
-            case R.id.playbar_next_id:
-                LogUtil.i(TAG, "onClick: 下一曲");
-
-                int next = getPosition();
-
-                isPlaying = true;
-
-                if (next == getCursor().getPosition() - 1) {
-                    setPosition(0);
-
-                    getCursor().moveToPosition(getPosition());
-
-                    updatePlaybar();
-                } else {
-                    setPosition(getPosition() + 1);
-
-                    getCursor().moveToPosition(getPosition());
-
-                    updatePlaybar();
-                }
-
-                sendMusicServiceAction(Config.MUSIC_ACTION_START, 0);
-
-                break;
-            case R.id.playbar_play_id:
+    /**
+     * 选择歌曲
+     *
+     * @param action 操作
+     */
+    private void switchMusic(String action) {
+        switch (action) {
+            // Playbar 播放按钮
+            case Config.MUSIC_ACTION_PLAY:
                 if (MusicUtil.getInstance().isPlaying()) {
                     LogUtil.i(TAG, "Muisc is Playing");
 
@@ -403,6 +360,56 @@ public class MainActivity extends BaseActivity {
 
                     sendMusicServiceAction(Config.MUSIC_ACTION_RESUME, 0);
                 }
+                return;
+            // 上一曲
+            case Config.MUSIC_ACTION_PREV:
+                LogUtil.i(TAG, "onClick: 上一曲");
+
+                if (getPosition() == 0) {
+                    setPosition(getCursor().getCount() - 1);
+                } else {
+                    setPosition(getPosition() - 1);
+                }
+                break;
+            // 下一曲
+            case Config.MUSIC_ACTION_NEXT:
+                LogUtil.i(TAG, "onClick: 下一曲");
+
+                if (getPosition() == getCursor().getPosition() - 1) {
+                    setPosition(0);
+                } else {
+                    setPosition(getPosition() + 1);
+                }
+                break;
+            // 随机播放
+            case Config.MUSIC_ACTION_RANDOM:
+                break;
+            // 单曲循环
+            case Config.MUSIC_ACTION_SINGLE:
+                break;
+            default:
+                break;
+        }
+
+        isPlaying = true;
+        sendMusicServiceAction(Config.MUSIC_ACTION_START, 0);
+        updatePlaybar();
+    }
+
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()) {
+            // 上一曲
+            case R.id.playbar_prev_id:
+                switchMusic(Config.MUSIC_ACTION_PREV);
+                break;
+            // 下一曲
+            case R.id.playbar_next_id:
+                switchMusic(Config.MUSIC_ACTION_NEXT);
+                break;
+            // 播放 & 暂停
+            case R.id.playbar_play_id:
+                switchMusic(Config.MUSIC_ACTION_PLAY);
                 break;
             default:
                 break;
