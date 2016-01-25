@@ -27,6 +27,7 @@ public class MusicUtil implements MediaPlayer.OnPreparedListener {
         mPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
             @Override
             public void onCompletion(MediaPlayer mp) {
+                LogUtil.i(TAG, "sendBroadcast");
                 context.sendBroadcast(new Intent(Config.MUSIC_ACTION_COMPLETE));
             }
         });

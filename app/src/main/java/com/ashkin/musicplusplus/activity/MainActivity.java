@@ -1,6 +1,9 @@
 package com.ashkin.musicplusplus.activity;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
@@ -50,6 +53,8 @@ public class MainActivity extends BaseActivity {
     private SettingsFragment settingsFragment;
     private ShareFragment shareFragment;
 
+    private MusicReceiver mReceiver;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -62,12 +67,32 @@ public class MainActivity extends BaseActivity {
         navigationView.setNavigationItemSelectedListener(this);
 
         showFragment(R.id.nav_music);
+
+        mReceiver = new MusicReceiver(this);
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+
+        IntentFilter filter = new IntentFilter();
+        filter.addAction(Config.MUSIC_ACTION_COMPLETE);
+        registerReceiver(mReceiver, filter);
     }
 
     @Override
     protected void onResume() {
         super.onResume();
         showFragment(R.id.nav_music);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+
+        if (null != mReceiver) {
+            unregisterReceiver(mReceiver);
+        }
     }
 
     /**
@@ -341,7 +366,7 @@ public class MainActivity extends BaseActivity {
      *
      * @param action 操作
      */
-    private void switchMusic(String action) {
+    public void switchMusic(String action) {
         switch (action) {
             // Playbar 播放按钮
             case Config.MUSIC_ACTION_PLAY:
@@ -413,6 +438,30 @@ public class MainActivity extends BaseActivity {
                 break;
             default:
                 break;
+        }
+    }
+
+    /**
+     * 歌曲播放完成的广播接收器
+     */
+    public static final class MusicReceiver extends BroadcastReceiver {
+
+        MainActivity activity;
+
+        public MusicReceiver(MainActivity activity) {
+            this.activity = activity;
+        }
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            switch (intent.getAction()) {
+                case Config.MUSIC_ACTION_COMPLETE:
+                    Log.i(TAG, "onReceive");
+                    activity.switchMusic(Config.MUSIC_ACTION_NEXT);
+                    break;
+                default:
+                    break;
+            }
         }
     }
 }
