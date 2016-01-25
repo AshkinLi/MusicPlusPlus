@@ -2,7 +2,6 @@ package com.ashkin.musicplusplus.fragment;
 
 import android.content.Context;
 import android.database.Cursor;
-import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.v4.app.LoaderManager;
@@ -17,11 +16,14 @@ import android.view.ViewGroup;
 import com.ashkin.musicplusplus.R;
 import com.ashkin.musicplusplus.activity.MainActivity;
 import com.ashkin.musicplusplus.adapter.CursorMusicAdapter;
+import com.ashkin.musicplusplus.utils.LogUtil;
 
 /**
  * 音乐列表
  */
 public class MusicListFragment extends BaseFragment implements LoaderManager.LoaderCallbacks<Cursor> {
+
+    public static final String TAG = "MusicListFragment";
 
     private OnFragmentInteractionListener mListener;
 
@@ -46,9 +48,11 @@ public class MusicListFragment extends BaseFragment implements LoaderManager.Loa
         return view;
     }
 
-    public void onButtonPressed(String msg) {
+    public void onItemPressed(Cursor cursor, int position) {
+        LogUtil.i(TAG, "onItemPressed: position = " + position);
+
         if (mListener != null) {
-            mListener.onFragmentInteraction(msg);
+            mListener.onFragmentInteraction(cursor, position);
         }
     }
 
@@ -90,7 +94,7 @@ public class MusicListFragment extends BaseFragment implements LoaderManager.Loa
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-        mRecyclerView.setAdapter(new CursorMusicAdapter(mContext, data));
+        mRecyclerView.setAdapter(new CursorMusicAdapter(this, data));
     }
 
     @Override

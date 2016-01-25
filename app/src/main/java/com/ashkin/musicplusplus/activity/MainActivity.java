@@ -281,17 +281,20 @@ public class MainActivity extends BaseActivity
         mArtist.setText(item.getArtist());
 
         if (MusicUtil.getInstance().isPlaying()) {
-            mPlay.setImageResource(R.drawable.ic_music_play);
-        } else {
             mPlay.setImageResource(R.drawable.ic_music_pause);
+        } else {
+            mPlay.setImageResource(R.drawable.ic_music_play);
         }
     }
-
-    @Override
-    public void onFragmentInteraction(MusicItem item) {
-        updatePlaybar(item);
-        MusicUtil.getInstance().start(item.getData());
-    }
+//
+//    @Override
+//    public void onFragmentInteraction(MusicItem item) {
+//        MusicUtil.getInstance().start(item.getData());
+//
+//        mPlay.setImageResource(R.drawable.ic_music_pause);
+//        updatePlaybar(item);
+//        setItem(item);
+//    }
 
     @Override
     public void onClick(View v) {
@@ -322,11 +325,11 @@ public class MainActivity extends BaseActivity
                 if (MusicUtil.getInstance().isPlaying()) {
                     LogUtil.i(TAG, "Muisc is Playing");
                     MusicUtil.getInstance().pause();
-                    mPlay.setImageResource(R.drawable.ic_music_play);
+                    updatePlaybar(getItem());
                 } else {
                     LogUtil.i(TAG, "Music is pause");
                     MusicUtil.getInstance().start();
-                    mPlay.setImageResource(R.drawable.ic_music_pause);
+                    updatePlaybar(getItem());
                 }
                 break;
             default:

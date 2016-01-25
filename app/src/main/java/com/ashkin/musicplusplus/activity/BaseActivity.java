@@ -1,7 +1,8 @@
 package com.ashkin.musicplusplus.activity;
 
-import android.support.v7.app.AppCompatActivity;
+import android.database.Cursor;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 
 import com.ashkin.musicplusplus.bean.MusicItem;
 import com.ashkin.musicplusplus.fragment.BaseFragment;
@@ -21,12 +22,7 @@ public class BaseActivity extends AppCompatActivity implements BaseFragment.OnFr
     }
 
     @Override
-    public void onFragmentInteraction(URL url) {
-
-    }
-
-    @Override
-    public void onFragmentInteraction(MusicItem item) {
+    public void onFragmentInteraction(Cursor cursor, int position) {
 
     }
 }

@@ -2,7 +2,6 @@ package com.ashkin.musicplusplus.fragment;
 
 import android.content.Context;
 import android.database.Cursor;
-import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.v4.app.Fragment;
@@ -17,6 +16,7 @@ import android.view.ViewGroup;
 
 import com.ashkin.musicplusplus.R;
 import com.ashkin.musicplusplus.adapter.CursorMusicAdapter;
+import com.ashkin.musicplusplus.utils.LogUtil;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -25,6 +25,8 @@ import com.ashkin.musicplusplus.adapter.CursorMusicAdapter;
  * to handle interaction events.
  */
 public class AlbumListFragment extends BaseFragment implements LoaderManager.LoaderCallbacks<Cursor> {
+
+    public static final String TAG = "AlbumListFragment";
 
     private Context mContext;
 
@@ -49,12 +51,14 @@ public class AlbumListFragment extends BaseFragment implements LoaderManager.Loa
         return view;
     }
 
-    // TODO: Rename method, update argument and hook method into UI event
-    public void onButtonPressed(String msg) {
+    @Override
+    public void onItemPressed(Cursor cursor, int position) {
+        LogUtil.i(TAG, "onItemPressed: position = " + position);
         if (mListener != null) {
-            mListener.onFragmentInteraction(msg);
+            mListener.onFragmentInteraction(cursor, position);
         }
     }
+
 
     @Override
     public void onAttach(Context context) {
@@ -95,7 +99,7 @@ public class AlbumListFragment extends BaseFragment implements LoaderManager.Loa
 
     @Override
     public void onLoadFinished(Loader loader, Cursor data) {
-        mRecyclerView.setAdapter(new CursorMusicAdapter(mContext, data));
+        mRecyclerView.setAdapter(new CursorMusicAdapter(this, data));
     }
 
     @Override

@@ -1,7 +1,6 @@
 package com.ashkin.musicplusplus.adapter;
 
 import android.annotation.TargetApi;
-import android.content.Context;
 import android.database.Cursor;
 import android.os.Build;
 import android.support.v7.widget.RecyclerView;
@@ -14,8 +13,7 @@ import android.widget.TextView;
 import com.ashkin.musicplusplus.R;
 import com.ashkin.musicplusplus.activity.MainActivity;
 import com.ashkin.musicplusplus.app.Config;
-import com.ashkin.musicplusplus.bean.MusicItem;
-import com.ashkin.musicplusplus.utils.MusicItemUtil;
+import com.ashkin.musicplusplus.fragment.BaseFragment;
 import com.ashkin.musicplusplus.utils.StringUtil;
 
 /**
@@ -26,18 +24,16 @@ public class CursorMusicAdapter extends RecyclerView.Adapter<CursorMusicAdapter.
     private static final int ITEM_NORMAL = 0;
     private static final int ITEM_FOOTER = 1;
 
-    private MainActivity mContext;
+    private BaseFragment mFragment;
     private final LayoutInflater mLayoutInflater;
     private Cursor mCursor;
     private MusicItemOnClickListener mListener;
 
-    public CursorMusicAdapter(Context context, Cursor cursor) {
-        mLayoutInflater = LayoutInflater.from(context);
-        if (context instanceof MainActivity) {
-            mContext = (MainActivity) context;
-        }
+    public CursorMusicAdapter(BaseFragment fragment, Cursor cursor) {
+        mLayoutInflater = LayoutInflater.from(fragment.getContext());
+        this.mFragment = fragment;
         this.mCursor = cursor;
-        mListener = new MusicItemOnClickListener(mContext, mCursor);
+        mListener = new MusicItemOnClickListener(fragment, mCursor);
     }
 
     @Override
@@ -46,8 +42,9 @@ public class CursorMusicAdapter extends RecyclerView.Adapter<CursorMusicAdapter.
             case ITEM_NORMAL:
                 return new MusicItemViewHolder(mLayoutInflater.inflate(R.layout.item_music, parent, false), ITEM_NORMAL);
             case ITEM_FOOTER:
-                View playbar = new View(mContext);
-                playbar.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, mContext.getPlaybarHeight()));
+                View playbar = new View(mFragment.getContext());
+                int height = ((MainActivity) mFragment.getContext()).getPlaybarHeight();
+                playbar.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, height));
                 return new MusicItemViewHolder(playbar, ITEM_FOOTER);
             default:
                 return null;
@@ -88,11 +85,11 @@ public class CursorMusicAdapter extends RecyclerView.Adapter<CursorMusicAdapter.
      */
     public static class MusicItemOnClickListener implements View.OnClickListener {
 
-        private MainActivity mContext;
+        private BaseFragment mFragment;
         private Cursor mCursor;
 
-        public MusicItemOnClickListener(Context context, Cursor cursor) {
-            mContext = (MainActivity) context;
+        public MusicItemOnClickListener(BaseFragment fragment, Cursor cursor) {
+            mFragment = fragment;
             mCursor = cursor;
         }
 
@@ -100,9 +97,7 @@ public class CursorMusicAdapter extends RecyclerView.Adapter<CursorMusicAdapter.
         public void onClick(View v) {
             mCursor.moveToPosition(v.getId());
 
-            mContext.setCursor(mCursor);
-            mContext.setPosition(v.getId());
-            mContext.onFragmentInteraction(MusicItemUtil.getMusicItem(mCursor));
+            mFragment.onItemPressed(mCursor, v.getId());
         }
     }
 
