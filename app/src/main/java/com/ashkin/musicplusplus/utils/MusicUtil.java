@@ -17,25 +17,25 @@ public class MusicUtil implements MediaPlayer.OnPreparedListener {
     public static final String TAG = "MusicUtil";
     private static MusicUtil instance;
 
-    private Context mContext;
     private MediaPlayer mPlayer;
     private int mSec;
 
     private MusicUtil(final Context context) {
-        this.mContext = context;
         this.mPlayer = new MediaPlayer();
         mPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
         mPlayer.setOnPreparedListener(this);
         mPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
             @Override
             public void onCompletion(MediaPlayer mp) {
-                context.sendBroadcast(new Intent(Config.ACTION_COMPLETE));
+                context.sendBroadcast(new Intent(Config.MUSIC_ACTION_COMPLETE));
             }
         });
     }
 
     public static void initialization(Context context) {
-        instance = new MusicUtil(context);
+        if (null == instance) {
+            instance = new MusicUtil(context);
+        }
     }
 
     public static MusicUtil getInstance() {
@@ -83,7 +83,6 @@ public class MusicUtil implements MediaPlayer.OnPreparedListener {
      * 暂停音乐
      */
     public void pause() {
-        // TODO: 暂停音乐
         if (null != mPlayer && mPlayer.isPlaying()) {
             LogUtil.i(TAG, "i : 暂停音乐");
             mPlayer.pause();
@@ -104,10 +103,20 @@ public class MusicUtil implements MediaPlayer.OnPreparedListener {
      * @return 如果正在播放，返回 true
      */
     public boolean isPlaying() {
+        return null != mPlayer && mPlayer.isPlaying();
+    }
+
+    /**
+     * 返回当前播放的毫秒数
+     *
+     * @return current position
+     */
+    public int getCurrentPosition() {
         if (null != mPlayer && mPlayer.isPlaying()) {
-            return true;
+            return mPlayer.getCurrentPosition();
         }
-        return false;
+
+        return 0;
     }
 
     @Override

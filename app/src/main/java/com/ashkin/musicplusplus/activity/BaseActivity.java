@@ -9,6 +9,7 @@ import android.view.View;
 
 import com.ashkin.musicplusplus.fragment.BaseFragment;
 import com.ashkin.musicplusplus.utils.LogUtil;
+import com.ashkin.musicplusplus.utils.MusicUtil;
 
 public class BaseActivity extends AppCompatActivity implements
         BaseFragment.OnFragmentInteractionListener, View.OnClickListener, NavigationView.OnNavigationItemSelectedListener {
@@ -18,6 +19,15 @@ public class BaseActivity extends AppCompatActivity implements
         super.onCreate(savedInstanceState);
 
         LogUtil.i(getClass().getName(), "onCreate");
+
+        MusicUtil.initialization(this);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+
+        MusicUtil.getInstance().release();
     }
 
     @Override

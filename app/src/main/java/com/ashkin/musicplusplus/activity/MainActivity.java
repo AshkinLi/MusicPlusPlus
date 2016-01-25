@@ -1,5 +1,6 @@
 package com.ashkin.musicplusplus.activity;
 
+import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
@@ -22,6 +23,7 @@ import com.ashkin.musicplusplus.fragment.MusicFragment;
 import com.ashkin.musicplusplus.fragment.RecentFragment;
 import com.ashkin.musicplusplus.fragment.SettingsFragment;
 import com.ashkin.musicplusplus.fragment.ShareFragment;
+import com.ashkin.musicplusplus.service.MusicService;
 import com.ashkin.musicplusplus.utils.CursorUtil;
 import com.ashkin.musicplusplus.utils.LogUtil;
 import com.ashkin.musicplusplus.utils.MusicUtil;
@@ -52,8 +54,6 @@ public class MainActivity extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-        MusicUtil.initialization(this);
 
         initToolbar();
         initPlaybar();
@@ -282,6 +282,12 @@ public class MainActivity extends BaseActivity {
         }
     }
 
+    /**
+     * Fragment 点击时的回调
+     *
+     * @param cursor   结果集
+     * @param position 当前选择的编号
+     */
     @Override
     public void onFragmentInteraction(Cursor cursor, int position) {
         super.onFragmentInteraction(cursor, position);
@@ -294,7 +300,40 @@ public class MainActivity extends BaseActivity {
 
         updatePlaybar();
 
-        MusicUtil.getInstance().start(cursor.getString(cursor.getColumnIndex(Config.MUSIC_DATA)));
+        sendMusicServiceAction(Config.MUSIC_ACTION_START, 0);
+    }
+
+    /**
+     * 往 MusicService 发送信息
+     *
+     * @param action 操作
+     * @param msec   播放的开始时间
+     */
+    private void sendMusicServiceAction(String action, int msec) {
+        Intent intent = new Intent(this, MusicService.class);
+        switch (action) {
+            // 播放音乐
+            case Config.MUSIC_ACTION_START:
+                intent.putExtra(Config.MUSIC_ACTION, Config.MUSIC_ACTION_START);
+                intent.putExtra(Config.MUSIC_DATA, CursorUtil.getData(getCursor(), getPosition()));
+                break;
+            // 从 msec 处播放音乐
+            case Config.MUSIC_ACTION_START_WITH_MSEC:
+                intent.putExtra(Config.MUSIC_ACTION, Config.MUSIC_ACTION_START);
+                intent.putExtra(Config.MUSIC_DATA, CursorUtil.getData(getCursor(), getPosition()));
+                intent.putExtra(Config.MUSIC_MSEC, msec);
+                break;
+            // 恢复播放
+            case Config.MUSIC_ACTION_RESUME:
+                intent.putExtra(Config.MUSIC_ACTION, Config.MUSIC_ACTION_RESUME);
+                break;
+            // 暂停播放
+            case Config.MUSIC_ACTION_PAUSE:
+                intent.putExtra(Config.MUSIC_ACTION, Config.MUSIC_ACTION_PAUSE);
+            default:
+                break;
+        }
+        startService(intent);
     }
 
     @Override
@@ -312,18 +351,16 @@ public class MainActivity extends BaseActivity {
 
                     getCursor().moveToPosition(getPosition());
 
-                    MusicUtil.getInstance().start(CursorUtil.getData(getCursor(), getPosition()));
-
                     updatePlaybar();
                 } else {
                     setPosition(getPosition() - 1);
 
                     getCursor().moveToPosition(getPosition());
 
-                    MusicUtil.getInstance().start(CursorUtil.getData(getCursor(), getPosition()));
-
                     updatePlaybar();
                 }
+
+                sendMusicServiceAction(Config.MUSIC_ACTION_START, 0);
 
                 break;
             case R.id.playbar_next_id:
@@ -338,34 +375,33 @@ public class MainActivity extends BaseActivity {
 
                     getCursor().moveToPosition(getPosition());
 
-                    MusicUtil.getInstance().start(CursorUtil.getData(getCursor(), getPosition()));
-
                     updatePlaybar();
                 } else {
                     setPosition(getPosition() + 1);
 
                     getCursor().moveToPosition(getPosition());
 
-                    MusicUtil.getInstance().start(CursorUtil.getData(getCursor(), getPosition()));
-
                     updatePlaybar();
                 }
 
+                sendMusicServiceAction(Config.MUSIC_ACTION_START, 0);
 
                 break;
             case R.id.playbar_play_id:
                 if (MusicUtil.getInstance().isPlaying()) {
                     LogUtil.i(TAG, "Muisc is Playing");
-                    MusicUtil.getInstance().pause();
 
                     isPlaying = false;
                     updatePlaybar();
+
+                    sendMusicServiceAction(Config.MUSIC_ACTION_PAUSE, 0);
                 } else {
                     LogUtil.i(TAG, "Music is pause");
-                    MusicUtil.getInstance().start();
 
                     isPlaying = true;
                     updatePlaybar();
+
+                    sendMusicServiceAction(Config.MUSIC_ACTION_RESUME, 0);
                 }
                 break;
             default:
