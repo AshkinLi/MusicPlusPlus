@@ -95,6 +95,7 @@ public class MusicListFragment extends BaseFragment implements LoaderManager.Loa
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
         mRecyclerView.setAdapter(new CursorMusicAdapter(this, data));
+        mContext.setCursor(data);
     }
 
     @Override

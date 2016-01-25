@@ -2,18 +2,22 @@ package com.ashkin.musicplusplus.activity;
 
 import android.database.Cursor;
 import android.os.Bundle;
+import android.support.design.widget.NavigationView;
 import android.support.v7.app.AppCompatActivity;
+import android.view.MenuItem;
+import android.view.View;
 
-import com.ashkin.musicplusplus.bean.MusicItem;
 import com.ashkin.musicplusplus.fragment.BaseFragment;
+import com.ashkin.musicplusplus.utils.LogUtil;
 
-import java.net.URL;
-
-public class BaseActivity extends AppCompatActivity implements BaseFragment.OnFragmentInteractionListener {
+public class BaseActivity extends AppCompatActivity implements
+        BaseFragment.OnFragmentInteractionListener, View.OnClickListener, NavigationView.OnNavigationItemSelectedListener {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        LogUtil.i(getClass().getName(), "onCreate");
     }
 
     @Override
@@ -23,6 +27,17 @@ public class BaseActivity extends AppCompatActivity implements BaseFragment.OnFr
 
     @Override
     public void onFragmentInteraction(Cursor cursor, int position) {
+        LogUtil.i(getClass().getName(), "onFragmentInteraction");
+    }
 
+    @Override
+    public void onClick(View v) {
+        LogUtil.i(getClass().getName(), "onClick");
+    }
+
+    @Override
+    public boolean onNavigationItemSelected(MenuItem item) {
+        LogUtil.i(getClass().getName(), "onNavigationItemSelected");
+        return false;
     }
 }

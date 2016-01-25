@@ -3,7 +3,6 @@ package com.ashkin.musicplusplus.activity;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
-import android.support.design.widget.NavigationView.OnNavigationItemSelectedListener;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.GravityCompat;
@@ -17,19 +16,19 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.ashkin.musicplusplus.R;
-import com.ashkin.musicplusplus.bean.MusicItem;
+import com.ashkin.musicplusplus.app.Config;
 import com.ashkin.musicplusplus.fragment.FavouriteFragment;
 import com.ashkin.musicplusplus.fragment.MusicFragment;
 import com.ashkin.musicplusplus.fragment.RecentFragment;
 import com.ashkin.musicplusplus.fragment.SettingsFragment;
 import com.ashkin.musicplusplus.fragment.ShareFragment;
+import com.ashkin.musicplusplus.utils.CursorUtil;
 import com.ashkin.musicplusplus.utils.LogUtil;
 import com.ashkin.musicplusplus.utils.MusicUtil;
 
 import java.util.List;
 
-public class MainActivity extends BaseActivity
-        implements OnNavigationItemSelectedListener, View.OnClickListener {
+public class MainActivity extends BaseActivity {
 
     public static final String TAG = "MainActivity";
 
@@ -41,7 +40,7 @@ public class MainActivity extends BaseActivity
 
     private Cursor mCursor = null;
     private int position = 0;
-    private MusicItem mItem = null;
+    private boolean isPlaying = false;
 
     private MusicFragment musicFragment;
     private FavouriteFragment favouriteFragment;
@@ -196,7 +195,8 @@ public class MainActivity extends BaseActivity
     @SuppressWarnings("StatementWithEmptyBody")
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
-        // Handle navigation view item clicks here.
+        super.onNavigationItemSelected(item);
+
         switch (item.getItemId()) {
             // 音乐列表界面
             case R.id.nav_music:
@@ -268,68 +268,104 @@ public class MainActivity extends BaseActivity
         this.position = position;
     }
 
-    public MusicItem getItem() {
-        return mItem;
-    }
+    /**
+     * 更新 Playbar 的数据
+     */
+    public void updatePlaybar() {
+        mTitle.setText(mCursor.getString(mCursor.getColumnIndex(Config.MUSIC_TITLE)));
+        mArtist.setText(mCursor.getString(mCursor.getColumnIndex(Config.MUSIC_ARTIST)));
 
-    public void setItem(MusicItem mItem) {
-        this.mItem = mItem;
-    }
-
-    public void updatePlaybar(MusicItem item) {
-        mTitle.setText(item.getTitle());
-        mArtist.setText(item.getArtist());
-
-        if (MusicUtil.getInstance().isPlaying()) {
+        if (isPlaying) {
             mPlay.setImageResource(R.drawable.ic_music_pause);
         } else {
             mPlay.setImageResource(R.drawable.ic_music_play);
         }
     }
-//
-//    @Override
-//    public void onFragmentInteraction(MusicItem item) {
-//        MusicUtil.getInstance().start(item.getData());
-//
-//        mPlay.setImageResource(R.drawable.ic_music_pause);
-//        updatePlaybar(item);
-//        setItem(item);
-//    }
+
+    @Override
+    public void onFragmentInteraction(Cursor cursor, int position) {
+        super.onFragmentInteraction(cursor, position);
+
+        setCursor(cursor);
+        setPosition(position);
+        cursor.moveToPosition(position);
+
+        isPlaying = true;
+
+        updatePlaybar();
+
+        MusicUtil.getInstance().start(cursor.getString(cursor.getColumnIndex(Config.MUSIC_DATA)));
+    }
 
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.playbar_prev_id:
-                // TODO:上一曲
-                LogUtil.i(TAG, "239: 上一曲");
+                LogUtil.i(TAG, "onClick: 上一曲");
 
-                int count = mCursor.getCount();
-                if (getPosition() < 0) {
-                    setPosition(mCursor.getCount() - 1);
+                isPlaying = true;
 
-                    mCursor.moveToPosition(getPosition());
-                    MusicUtil.getInstance().start();
+                int prev = getPosition();
+
+                if (prev == 0) {
+                    setPosition(getCursor().getCount() - 1);
+
+                    getCursor().moveToPosition(getPosition());
+
+                    MusicUtil.getInstance().start(CursorUtil.getData(getCursor(), getPosition()));
+
+                    updatePlaybar();
                 } else {
                     setPosition(getPosition() - 1);
 
-                    mCursor.moveToPosition(getPosition());
-                    MusicUtil.getInstance().start();
+                    getCursor().moveToPosition(getPosition());
+
+                    MusicUtil.getInstance().start(CursorUtil.getData(getCursor(), getPosition()));
+
+                    updatePlaybar();
                 }
+
                 break;
             case R.id.playbar_next_id:
-                // TODO:下一曲
-                LogUtil.i(TAG, "243: 下一曲");
+                LogUtil.i(TAG, "onClick: 下一曲");
+
+                int next = getPosition();
+
+                isPlaying = true;
+
+                if (next == getCursor().getPosition() - 1) {
+                    setPosition(0);
+
+                    getCursor().moveToPosition(getPosition());
+
+                    MusicUtil.getInstance().start(CursorUtil.getData(getCursor(), getPosition()));
+
+                    updatePlaybar();
+                } else {
+                    setPosition(getPosition() + 1);
+
+                    getCursor().moveToPosition(getPosition());
+
+                    MusicUtil.getInstance().start(CursorUtil.getData(getCursor(), getPosition()));
+
+                    updatePlaybar();
+                }
+
+
                 break;
             case R.id.playbar_play_id:
-                // TODO: 播放、暂停
                 if (MusicUtil.getInstance().isPlaying()) {
                     LogUtil.i(TAG, "Muisc is Playing");
                     MusicUtil.getInstance().pause();
-                    updatePlaybar(getItem());
+
+                    isPlaying = false;
+                    updatePlaybar();
                 } else {
                     LogUtil.i(TAG, "Music is pause");
                     MusicUtil.getInstance().start();
-                    updatePlaybar(getItem());
+
+                    isPlaying = true;
+                    updatePlaybar();
                 }
                 break;
             default:

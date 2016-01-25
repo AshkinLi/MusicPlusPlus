@@ -12,9 +12,8 @@ import android.widget.TextView;
 
 import com.ashkin.musicplusplus.R;
 import com.ashkin.musicplusplus.activity.MainActivity;
-import com.ashkin.musicplusplus.app.Config;
 import com.ashkin.musicplusplus.fragment.BaseFragment;
-import com.ashkin.musicplusplus.utils.StringUtil;
+import com.ashkin.musicplusplus.utils.CursorUtil;
 
 /**
  * 音乐列表适配器
@@ -66,9 +65,9 @@ public class CursorMusicAdapter extends RecyclerView.Adapter<CursorMusicAdapter.
             mCursor.moveToPosition(position);
 
             holder.mNoTextView.setText(position + 1 + "");
-            holder.mTitleTextView.setText(mCursor.getString(mCursor.getColumnIndex(Config.MUSIC_TITLE)));
-            holder.mArtistTextView.setText(mCursor.getString(mCursor.getColumnIndex(Config.MUSIC_ARTIST)));
-            holder.mDurationTextView.setText(StringUtil.durationToData(mCursor.getInt(mCursor.getColumnIndex(Config.MUSIC_DURATION))));
+            holder.mTitleTextView.setText(CursorUtil.getTitle(mCursor, position));
+            holder.mArtistTextView.setText(CursorUtil.getArtist(mCursor, position));
+            holder.mDurationTextView.setText(CursorUtil.getDuration(mCursor, position));
 
             holder.mItemView.setId(position);
             holder.mItemView.setOnClickListener(mListener);
