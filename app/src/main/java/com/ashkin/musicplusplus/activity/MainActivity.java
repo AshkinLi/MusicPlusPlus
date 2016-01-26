@@ -5,6 +5,10 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.media.MediaMetadataRetriever;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
@@ -300,10 +304,56 @@ public class MainActivity extends BaseActivity {
         mTitle.setText(mCursor.getString(mCursor.getColumnIndex(Config.MUSIC_TITLE)));
         mArtist.setText(mCursor.getString(mCursor.getColumnIndex(Config.MUSIC_ARTIST)));
 
+        new PictureAsyncTask(this, mIcon).execute(CursorUtil.getData(getCursor(), getPosition()));
+
         if (isPlaying) {
             mPlay.setImageResource(R.drawable.ic_music_pause);
         } else {
             mPlay.setImageResource(R.drawable.ic_music_play);
+        }
+    }
+
+    private static final class PictureAsyncTask extends AsyncTask<String, Object, Bitmap> {
+
+        Context mContext;
+        ImageView mImageView;
+
+        private PictureAsyncTask(Context context, ImageView view) {
+            mContext = context;
+            mImageView = view;
+        }
+
+        @Override
+        protected Bitmap doInBackground(String... params) {
+            String data = params[0];
+
+            Bitmap bitmap;
+
+            // 获取专辑图片
+            MediaMetadataRetriever retriever = new MediaMetadataRetriever();
+            retriever.setDataSource(data);
+            byte[] picture = retriever.getEmbeddedPicture();
+            retriever.getFrameAtTime();
+
+            if (null != picture) {
+                Log.i(TAG, "有图片");
+                bitmap = BitmapFactory.decodeByteArray(picture, 0, picture.length);
+            } else {
+                Log.i(TAG, "没图片");
+                bitmap = BitmapFactory.decodeResource(mContext.getResources(), R.drawable.ic_album);
+            }
+
+            return bitmap;
+        }
+
+        @Override
+        protected void onPostExecute(Bitmap bitmap) {
+            super.onPostExecute(bitmap);
+
+            mImageView.setImageBitmap(bitmap);
+
+            mImageView = null;
+            mContext = null;
         }
     }
 
