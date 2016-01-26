@@ -1,5 +1,8 @@
 package com.ashkin.musicplusplus.activity;
 
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -8,11 +11,14 @@ import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.media.MediaMetadataRetriever;
+import android.media.session.MediaSession;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.app.NotificationCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.widget.Toolbar;
@@ -81,6 +87,9 @@ public class MainActivity extends BaseActivity {
 
         IntentFilter filter = new IntentFilter();
         filter.addAction(Config.MUSIC_ACTION_COMPLETE);
+        filter.addAction(Config.MUSIC_ACTION_PREV);
+        filter.addAction(Config.MUSIC_ACTION_PLAY);
+        filter.addAction(Config.MUSIC_ACTION_NEXT);
         registerReceiver(mReceiver, filter);
     }
 
@@ -301,60 +310,16 @@ public class MainActivity extends BaseActivity {
      * 更新 Playbar 的数据
      */
     public void updatePlaybar() {
-        mTitle.setText(mCursor.getString(mCursor.getColumnIndex(Config.MUSIC_TITLE)));
-        mArtist.setText(mCursor.getString(mCursor.getColumnIndex(Config.MUSIC_ARTIST)));
-
-        new PictureAsyncTask(this, mIcon).execute(CursorUtil.getData(getCursor(), getPosition()));
+        mTitle.setText(CursorUtil.getTitle(getCursor(), getPosition()));
+        mArtist.setText(CursorUtil.getTitle(getCursor(), getPosition()));
 
         if (isPlaying) {
             mPlay.setImageResource(R.drawable.ic_music_pause);
         } else {
             mPlay.setImageResource(R.drawable.ic_music_play);
         }
-    }
 
-    private static final class PictureAsyncTask extends AsyncTask<String, Object, Bitmap> {
-
-        Context mContext;
-        ImageView mImageView;
-
-        private PictureAsyncTask(Context context, ImageView view) {
-            mContext = context;
-            mImageView = view;
-        }
-
-        @Override
-        protected Bitmap doInBackground(String... params) {
-            String data = params[0];
-
-            Bitmap bitmap;
-
-            // 获取专辑图片
-            MediaMetadataRetriever retriever = new MediaMetadataRetriever();
-            retriever.setDataSource(data);
-            byte[] picture = retriever.getEmbeddedPicture();
-            retriever.getFrameAtTime();
-
-            if (null != picture) {
-                Log.i(TAG, "有图片");
-                bitmap = BitmapFactory.decodeByteArray(picture, 0, picture.length);
-            } else {
-                Log.i(TAG, "没图片");
-                bitmap = BitmapFactory.decodeResource(mContext.getResources(), R.drawable.ic_album);
-            }
-
-            return bitmap;
-        }
-
-        @Override
-        protected void onPostExecute(Bitmap bitmap) {
-            super.onPostExecute(bitmap);
-
-            mImageView.setImageBitmap(bitmap);
-
-            mImageView = null;
-            mContext = null;
-        }
+        new PictureAsyncTask(this, mIcon).execute(CursorUtil.getData(getCursor(), getPosition()));
     }
 
     /**
@@ -492,6 +457,132 @@ public class MainActivity extends BaseActivity {
     }
 
     /**
+     * 根据 action 获取不同类型的 PendingIntent
+     *
+     * @param action Music Action
+     * @return PendingIntent
+     */
+    public PendingIntent getPendingIntent(String action) {
+        return PendingIntent.getBroadcast(getApplicationContext(), 0,
+                new Intent(action),
+                PendingIntent.FLAG_UPDATE_CURRENT);
+    }
+
+    /**
+     * 更新通知栏的歌曲信息
+     */
+    public void updateNotification(Bitmap bitmap) {
+        PendingIntent openActivity = PendingIntent.getActivity(getApplicationContext(), 0,
+                new Intent(getApplicationContext(), MainActivity.class),
+                PendingIntent.FLAG_UPDATE_CURRENT);
+
+        Notification notification;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            Notification.Builder builder = new Notification.Builder(this);
+
+            builder = builder.setSmallIcon(R.drawable.ic_album)
+                    .setContentIntent(openActivity)
+                    .setStyle(new Notification.MediaStyle()
+                            .setShowActionsInCompactView(2)
+                            .setMediaSession(new MediaSession(this, "music").getSessionToken()))
+                    .setPriority(Notification.PRIORITY_MAX)
+                    .setVisibility(Notification.VISIBILITY_PUBLIC)
+                    .setContentTitle(CursorUtil.getTitle(getCursor(), getPosition()))
+                    .setContentText(CursorUtil.getArtist(getCursor(), getPosition()))
+                    .setLargeIcon(bitmap);
+
+            if (MusicUtil.getInstance().isPlaying()) {
+                builder = builder
+                        .addAction(R.drawable.ic_music_prev, "上一曲", getPendingIntent(Config.MUSIC_ACTION_PREV))
+                        .addAction(R.drawable.ic_music_pause, "暂停", getPendingIntent(Config.MUSIC_ACTION_PLAY))
+                        .addAction(R.drawable.ic_music_next, "下一曲", getPendingIntent(Config.MUSIC_ACTION_NEXT));
+            } else {
+                builder = builder
+                        .addAction(R.drawable.ic_music_prev, "上一曲", getPendingIntent(Config.MUSIC_ACTION_PREV))
+                        .addAction(R.drawable.ic_music_play, "播放", getPendingIntent(Config.MUSIC_ACTION_PLAY))
+                        .addAction(R.drawable.ic_music_next, "下一曲", getPendingIntent(Config.MUSIC_ACTION_NEXT));
+            }
+
+            notification = builder.build();
+        } else {
+            NotificationCompat.Builder builder = new NotificationCompat.Builder(this);
+
+            builder.setSmallIcon(R.drawable.ic_album)
+                    .setContentIntent(openActivity)
+                    .setPriority(Notification.PRIORITY_MAX)
+                    .setVisibility(Notification.VISIBILITY_PUBLIC)
+                    .setContentTitle(CursorUtil.getTitle(getCursor(), getPosition()))
+                    .setContentText(CursorUtil.getArtist(getCursor(), getPosition()))
+                    .setLargeIcon(bitmap);
+
+            if (MusicUtil.getInstance().isPlaying()) {
+                builder = builder
+                        .addAction(R.drawable.ic_music_prev, "上一曲", getPendingIntent(Config.MUSIC_ACTION_PREV))
+                        .addAction(R.drawable.ic_music_pause, "暂停", getPendingIntent(Config.MUSIC_ACTION_PLAY))
+                        .addAction(R.drawable.ic_music_next, "下一曲", getPendingIntent(Config.MUSIC_ACTION_NEXT));
+            } else {
+                builder = builder
+                        .addAction(R.drawable.ic_music_prev, "上一曲", getPendingIntent(Config.MUSIC_ACTION_PREV))
+                        .addAction(R.drawable.ic_music_play, "播放", getPendingIntent(Config.MUSIC_ACTION_PLAY))
+                        .addAction(R.drawable.ic_music_next, "下一曲", getPendingIntent(Config.MUSIC_ACTION_NEXT));
+            }
+            notification = builder.build();
+        }
+
+        NotificationManager manager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        manager.notify(100, notification);
+    }
+
+    /**
+     * 异步加载 Playbar 图片
+     */
+    private static final class PictureAsyncTask extends AsyncTask<String, Object, Bitmap> {
+
+        Context mContext;
+        ImageView mImageView;
+
+        private PictureAsyncTask(Context context, ImageView view) {
+            mContext = context;
+            mImageView = view;
+        }
+
+        @Override
+        protected Bitmap doInBackground(String... params) {
+            String data = params[0];
+
+            Bitmap bitmap;
+
+            // 获取专辑图片
+            MediaMetadataRetriever retriever = new MediaMetadataRetriever();
+            retriever.setDataSource(data);
+            byte[] picture = retriever.getEmbeddedPicture();
+            retriever.getFrameAtTime();
+
+            if (null != picture) {
+                Log.i(TAG, "有图片");
+                bitmap = BitmapFactory.decodeByteArray(picture, 0, picture.length);
+            } else {
+                Log.i(TAG, "没图片");
+                bitmap = BitmapFactory.decodeResource(mContext.getResources(), R.drawable.ic_album);
+            }
+
+            return bitmap;
+        }
+
+        @Override
+        protected void onPostExecute(Bitmap bitmap) {
+            super.onPostExecute(bitmap);
+
+            mImageView.setImageBitmap(bitmap);
+
+            ((MainActivity) mContext).updateNotification(bitmap);
+
+            mImageView = null;
+            mContext = null;
+        }
+    }
+
+    /**
      * 歌曲播放完成的广播接收器
      */
     public static final class MusicReceiver extends BroadcastReceiver {
@@ -504,9 +595,18 @@ public class MainActivity extends BaseActivity {
 
         @Override
         public void onReceive(Context context, Intent intent) {
+            Log.i(TAG, "onReceive");
             switch (intent.getAction()) {
+                case Config.MUSIC_ACTION_NEXT:
+                    activity.switchMusic(Config.MUSIC_ACTION_NEXT);
+                    break;
+                case Config.MUSIC_ACTION_PREV:
+                    activity.switchMusic(Config.MUSIC_ACTION_PREV);
+                    break;
+                case Config.MUSIC_ACTION_PLAY:
+                    activity.switchMusic(Config.MUSIC_ACTION_PLAY);
+                    break;
                 case Config.MUSIC_ACTION_COMPLETE:
-                    Log.i(TAG, "onReceive");
                     activity.switchMusic(Config.MUSIC_ACTION_NEXT);
                     break;
                 default:
